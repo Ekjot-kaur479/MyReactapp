@@ -2,17 +2,16 @@ pipeline {
     agent any
 
     environment {
-        SSH_KEY   = 'ec2-ssh-key'          // Jenkins credential ID for your EC2 SSH key
-        EC2_USER  = 'ubuntu'               // Your EC2 username
-        EC2_HOST  = '54.163.39.50'         // Replace with your EC2 Public IP
-        DEPLOY_DIR = '/var/www/myreactapp' // Deployment directory on EC2
+        DEPLOY_DIR = "/var/www/html/myreactapp"
+        EC2_USER   = "ubuntu"
+        EC2_HOST   = "3.88.224.58"
+        SSH_KEY    = "cicd-new-key"   // Jenkins credentials ID (SSH key for EC2)
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'git@github.com:Ekjot-kaur479/MyReactapp.git'
+                git branch: 'main', url: 'https://github.com/Ekjot-kaur479/MyReactapp.git'
             }
         }
 
@@ -30,21 +29,22 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh '''
-                sudo rm -rf /var/www/html/*
-                sudo cp -r dist/* /var/www/html/
-                echo "Deployment completed!"
-                '''
+                sshagent (credentials: ["cicd-new-key"]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo mkdir -p $DEPLOY_DIR && sudo rm -rf $DEPLOY_DIR/*'
+                        scp -o StrictHostKeyChecking=no -r dist/* $EC2_USER@$EC2_HOST:$DEPLOY_DIR/
+                    """
+                }
             }
         }
     }
 
     post {
         success {
-            echo "✅ Deployment completed successfully!"
+            echo "✅ React App Deployed Successfully to EC2 ($EC2_HOST)!"
         }
         failure {
-            echo "❌ Deployment failed. Check logs!"
+            echo "❌ Build/Deploy Failed!"
         }
     }
 }
