@@ -28,13 +28,13 @@ pipeline {
             }
         }
 
-     stage('Deploy') {
-    steps {
-        sh '''
-        sudo cp -r dist/* /var/www/html/
-        echo "Deployment completed!"
-        '''        
-                }
+        stage('Deploy') {
+            steps {
+                sh '''
+                sudo rm -rf /var/www/html/*
+                sudo cp -r dist/* /var/www/html/
+                echo "Deployment completed!"
+                '''
             }
         }
     }
