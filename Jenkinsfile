@@ -26,17 +26,17 @@ pipeline {
                 sh 'npm run build'
             }
         }
-
-        stage('Deploy') {
-            steps {
-                sshagent (credentials: ["${SSH_KEY}"]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo rm -rf $DEPLOY_DIR/* && sudo mkdir -p $DEPLOY_DIR'
-                        scp -o StrictHostKeyChecking=no -r dist/* $EC2_USER@$EC2_HOST:$DEPLOY_DIR/
-                    """
-                }
-            }
+       stage('Deploy') {
+    steps {
+        sshagent (credentials: ["${SSH_KEY}"]) {
+            sh """
+                ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo mkdir -p $DEPLOY_DIR && sudo rm -rf $DEPLOY_DIR/*'
+                scp -o StrictHostKeyChecking=no -r build/* $EC2_USER@$EC2_HOST:$DEPLOY_DIR/
+            """
         }
+    }
+}
+
     }
 
     post {
