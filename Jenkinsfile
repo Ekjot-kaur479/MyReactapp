@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Ekjot-kaur479/MyReactapp.git'
+                git branch: 'main', url: 'git@github.com:Ekjot-kaur479/MyReactapp.git'
             }
         }
 
@@ -29,7 +29,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent (credentials: ["new-react.pem"]) {
+                sshagent (credentials: ['cicd-new-key']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo mkdir -p $DEPLOY_DIR && sudo rm -rf $DEPLOY_DIR/*'
                         scp -o StrictHostKeyChecking=no -r dist/* $EC2_USER@$EC2_HOST:$DEPLOY_DIR/
