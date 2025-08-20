@@ -16,7 +16,7 @@ function Home() {
           <div className="card shadow-lg border-0">
             <div className="card-body">
               <h5 className="card-title">📌 Easy Navigation</h5>
-              <p className="card-text">Switch between pages quickly with React Router.</p>
+              <p className="card-text">Switch between pages quickly with React Router.jdhejhiuhiurhunmdf mnbnmsbnsbbhjdsbhdkskueu nm hbhjjnj</p>
             </div>
           </div>
         </div>
