@@ -1,17 +1,12 @@
 pipeline {
     agent any
 
-    environment {
-        DEPLOY_DIR = "/var/www/html/myreactapp"
-        EC2_USER   = "ubuntu"
-        EC2_HOST   = "3.88.224.58"
-        SSH_KEY    = "final-key"   // Jenkins credentials ID (SSH key for EC2)
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'git@github.com:Ekjot-kaur479/MyReactapp.git'
+                git branch: 'main',
+                    url: 'git@github.com:Ekjot-kaur479/MyReactapp.git',
+                    credentialsId: 'github-ssh'
             }
         }
 
@@ -21,30 +16,17 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build React App') {
             steps {
                 sh 'npm run build'
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Nginx') {
             steps {
-                sshagent (credentials: [SSH_KEY]) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo mkdir -p $DEPLOY_DIR && sudo rm -rf $DEPLOY_DIR/*'
-                        scp -o StrictHostKeyChecking=no -r dist/* $EC2_USER@$EC2_HOST:$DEPLOY_DIR/
-                    """
-                }
+                sh 'rm -rf /var/www/html/*'
+                sh 'cp -r build/* /var/www/html/'
             }
-        }
-    }
-
-    post {
-        success {
-            echo "✅ React App Deployed Successfully to EC2 ($EC2_HOST)!"
-        }
-        failure {
-            echo "❌ Build/Deploy Failed!"
         }
     }
 }
