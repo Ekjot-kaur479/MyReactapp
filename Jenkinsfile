@@ -5,7 +5,7 @@ pipeline {
         DEPLOY_DIR = "/var/www/html/myreactapp"
         EC2_USER   = "ubuntu"
         EC2_HOST   = "3.88.224.58"
-        SSH_KEY    = "cicd-new-key"   // Jenkins credentials ID (SSH key for EC2)
+        SSH_KEY    = "final-key"   // Jenkins credentials ID (SSH key for EC2)
     }
 
     stages {
@@ -29,7 +29,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent (credentials: ['cicd-new-key']) {
+                sshagent (credentials: ['final-key']) {
                     sh """
                         ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST 'sudo mkdir -p $DEPLOY_DIR && sudo rm -rf $DEPLOY_DIR/*'
                         scp -o StrictHostKeyChecking=no -r dist/* $EC2_USER@$EC2_HOST:$DEPLOY_DIR/
